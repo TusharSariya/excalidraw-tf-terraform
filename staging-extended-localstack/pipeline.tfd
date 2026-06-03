@@ -1,0 +1,267 @@
+tfd 2
+# Pipeline-wide declared dataflow for staging-extended-localstack.
+# Single-state replica of staging-multi-state: same topology, one Terraform root.
+# All binds use the single stack ID "staging-extended-localstack".
+
+# Hub network ingress / egress
+bind east_igw            = staging-extended-localstack::module.east_network.module.vpc.aws_internet_gateway.this[0]
+bind east_nat            = staging-extended-localstack::module.east_network.module.vpc.aws_nat_gateway.this[0]
+
+# ECS ingress + producer + queues + consumer + egress worker
+bind ecs_alb             = staging-extended-localstack::aws_lb.ecs
+bind ecs_listener        = staging-extended-localstack::aws_lb_listener.http
+bind ecs_target_group    = staging-extended-localstack::aws_lb_target_group.ecs
+bind ecs_producer        = staging-extended-localstack::aws_ecs_service.producer
+bind event_queue         = staging-extended-localstack::module.ingress_queue.module.queue.aws_sqs_queue.this[0]
+bind ingress_dlq         = staging-extended-localstack::module.ingress_queue.module.queue.aws_sqs_queue.dlq[0]
+bind egress_queue        = staging-extended-localstack::module.egress_queue.module.queue.aws_sqs_queue.this[0]
+bind egress_dlq          = staging-extended-localstack::module.egress_queue.module.queue.aws_sqs_queue.dlq[0]
+bind queue_consumer      = staging-extended-localstack::module.consumer_lambda.module.lambda.aws_lambda_function.this[0]
+bind network_egress_ecs  = staging-extended-localstack::aws_ecs_service.egress
+bind ingress_dlq_alarm   = staging-extended-localstack::module.ingress_queue.aws_cloudwatch_metric_alarm.dlq_visible_messages[0]
+bind egress_dlq_alarm    = staging-extended-localstack::module.egress_queue.aws_cloudwatch_metric_alarm.dlq_visible_messages[0]
+bind consumer_errors_alarm = staging-extended-localstack::module.consumer_lambda.aws_cloudwatch_metric_alarm.lambda_errors[0]
+
+# API Gateway front doors
+bind api1_gateway        = staging-extended-localstack::module.api1.aws_api_gateway_rest_api.private
+bind api2_gateway        = staging-extended-localstack::module.api2.aws_api_gateway_rest_api.private
+bind api3_gateway        = staging-extended-localstack::module.api3.aws_api_gateway_rest_api.private
+bind api4_gateway        = staging-extended-localstack::module.api4.aws_api_gateway_rest_api.private
+bind api5_gateway        = staging-extended-localstack::module.api5.aws_api_gateway_rest_api.private
+bind api6_gateway        = staging-extended-localstack::module.api6.aws_api_gateway_rest_api.private
+bind api7_gateway        = staging-extended-localstack::module.api7.aws_api_gateway_rest_api.private
+bind api8_gateway        = staging-extended-localstack::module.api8.aws_api_gateway_rest_api.private
+bind api9_gateway        = staging-extended-localstack::module.api9.aws_api_gateway_rest_api.private
+bind api10_gateway       = staging-extended-localstack::module.api10.aws_api_gateway_rest_api.private
+bind api11_gateway       = staging-extended-localstack::module.api11.aws_api_gateway_rest_api.private
+bind api12_gateway       = staging-extended-localstack::module.api12.aws_api_gateway_rest_api.private
+bind api14_gateway       = staging-extended-localstack::module.api14.aws_api_gateway_rest_api.private
+bind api15_gateway       = staging-extended-localstack::module.api15.aws_api_gateway_rest_api.private
+bind api16_gateway       = staging-extended-localstack::module.api16.aws_api_gateway_rest_api.private
+
+# Compute: Lambda (1,4,6,10,12,16) or ECS service (2,3,5,7,8,9,11,14,15)
+bind api1_compute        = staging-extended-localstack::module.api1.module.lambda_service.module.lambda.aws_lambda_function.this[0]
+bind api2_compute        = staging-extended-localstack::module.api2.aws_ecs_service.api
+bind api3_compute        = staging-extended-localstack::module.api3.aws_ecs_service.api
+bind api4_compute        = staging-extended-localstack::module.api4.module.lambda_service.module.lambda.aws_lambda_function.this[0]
+bind api5_compute        = staging-extended-localstack::module.api5.aws_ecs_service.api
+bind api6_compute        = staging-extended-localstack::module.api6.module.lambda_service.module.lambda.aws_lambda_function.this[0]
+bind api7_compute        = staging-extended-localstack::module.api7.aws_ecs_service.api
+bind api8_compute        = staging-extended-localstack::module.api8.aws_ecs_service.api
+bind api9_compute        = staging-extended-localstack::module.api9.aws_ecs_service.api
+bind api10_compute       = staging-extended-localstack::module.api10.module.lambda_service.module.lambda.aws_lambda_function.this[0]
+bind api11_compute       = staging-extended-localstack::module.api11.aws_ecs_service.api
+bind api12_compute       = staging-extended-localstack::module.api12.module.lambda_service.module.lambda.aws_lambda_function.this[0]
+bind api14_compute       = staging-extended-localstack::module.api14.aws_ecs_service.api
+bind api15_compute       = staging-extended-localstack::module.api15.aws_ecs_service.api
+bind api16_compute       = staging-extended-localstack::module.api16.module.lambda_service.module.lambda.aws_lambda_function.this[0]
+
+# SSM config parameters
+bind api1_ssm_name       = staging-extended-localstack::module.api1.aws_ssm_parameter.api_name
+bind api2_ssm_name       = staging-extended-localstack::module.api2.aws_ssm_parameter.api_name
+bind api3_ssm_name       = staging-extended-localstack::module.api3.aws_ssm_parameter.api_name
+bind api4_ssm_name       = staging-extended-localstack::module.api4.aws_ssm_parameter.api_name
+bind api5_ssm_name       = staging-extended-localstack::module.api5.aws_ssm_parameter.api_name
+bind api6_ssm_name       = staging-extended-localstack::module.api6.aws_ssm_parameter.api_name
+bind api7_ssm_name       = staging-extended-localstack::module.api7.aws_ssm_parameter.api_name
+bind api8_ssm_name       = staging-extended-localstack::module.api8.aws_ssm_parameter.api_name
+bind api9_ssm_name       = staging-extended-localstack::module.api9.aws_ssm_parameter.api_name
+bind api10_ssm_name      = staging-extended-localstack::module.api10.aws_ssm_parameter.api_name
+bind api11_ssm_name      = staging-extended-localstack::module.api11.aws_ssm_parameter.api_name
+bind api12_ssm_name      = staging-extended-localstack::module.api12.aws_ssm_parameter.api_name
+bind api14_ssm_name      = staging-extended-localstack::module.api14.aws_ssm_parameter.api_name
+bind api15_ssm_name      = staging-extended-localstack::module.api15.aws_ssm_parameter.api_name
+bind api16_ssm_name      = staging-extended-localstack::module.api16.aws_ssm_parameter.api_name
+
+# Dedicated datastores
+bind api1_store          = staging-extended-localstack::module.api1_table.aws_dynamodb_table.this
+bind api2_store          = staging-extended-localstack::module.api2_rds.aws_db_instance.this
+bind api3_store          = staging-extended-localstack::module.api3_aurora.aws_rds_cluster.this
+bind api4_store          = staging-extended-localstack::module.api4_bucket.module.bucket.module.bucket.aws_s3_bucket.this[0]
+bind api5_store          = staging-extended-localstack::module.api5_table.aws_dynamodb_table.this
+bind api6_store          = staging-extended-localstack::module.api6_rds.aws_db_instance.this
+bind api7_store          = staging-extended-localstack::module.api7_aurora.aws_rds_cluster.this
+bind api8_store          = staging-extended-localstack::module.api8_west_bucket.module.bucket.module.bucket.aws_s3_bucket.this[0]
+bind api9_store          = staging-extended-localstack::module.api9_west_rds.aws_db_instance.this
+bind api10_store         = staging-extended-localstack::module.api10_table.aws_dynamodb_table.this
+bind api11_store         = staging-extended-localstack::module.api11_aurora.aws_rds_cluster.this
+bind api12_store         = staging-extended-localstack::module.api12_bucket.module.bucket.module.bucket.aws_s3_bucket.this[0]
+bind api14_store         = staging-extended-localstack::module.api14_table.aws_dynamodb_table.this
+bind api15_store         = staging-extended-localstack::module.api15_aurora.aws_rds_cluster.this
+bind api16_store         = staging-extended-localstack::module.api16_rds.aws_db_instance.this
+
+# Extended lake, stream, Kubernetes, regional persistence, and audit lanes
+bind ingest_fifo_queue   = staging-extended-localstack::aws_sqs_queue.ingest_fifo
+bind ingest_fifo_dlq     = staging-extended-localstack::aws_sqs_queue.ingest_fifo_dlq
+bind lake_ingestor_lambda = staging-extended-localstack::aws_lambda_function.lake_ingestor
+bind kinesis_data_stream = staging-extended-localstack::aws_kinesis_stream.provisioned
+bind kinesis_burst_stream = staging-extended-localstack::aws_kinesis_stream.burst_on_demand
+bind enhanced_consumer   = staging-extended-localstack::aws_cloudwatch_log_group.enhanced_consumer
+bind stream_processor_lambda = staging-extended-localstack::aws_lambda_function.stream_processor
+bind firehose_raw_delivery = staging-extended-localstack::aws_kinesis_firehose_delivery_stream.raw_delivery
+bind raw_lake_bucket     = staging-extended-localstack::aws_s3_bucket.lake["raw"]
+bind curated_lake_bucket = staging-extended-localstack::aws_s3_bucket.lake["curated"]
+bind archive_lake_bucket = staging-extended-localstack::aws_s3_bucket.lake["archive"]
+bind quarantine_bucket   = staging-extended-localstack::aws_s3_bucket.lake["quarantine"]
+bind audit_bucket        = staging-extended-localstack::aws_s3_bucket.lake["audit"]
+bind raw_replica_west    = staging-extended-localstack::aws_s3_bucket.lake_replica_west["raw"]
+bind curated_replica_west_1 = staging-extended-localstack::aws_s3_bucket.lake_replica_west_1["curated"]
+bind archive_replica_east_2 = staging-extended-localstack::aws_s3_bucket.lake_replica_east_2["archive"]
+bind sns_event_bus_topic = staging-extended-localstack::aws_sns_topic.event_bus
+bind priority_standard_queue = staging-extended-localstack::aws_sqs_queue.priority_standard
+bind replay_fifo_queue   = staging-extended-localstack::aws_sqs_queue.replay_fifo
+bind quarantine_queue    = staging-extended-localstack::aws_sqs_queue.quarantine
+
+bind eks_cluster         = staging-extended-localstack::aws_eks_cluster.stream_processors
+bind eks_node_group      = staging-extended-localstack::aws_eks_node_group.stream_processors
+bind eks_fargate_profile = staging-extended-localstack::aws_eks_fargate_profile.stream_processors
+bind eks_coredns_addon   = staging-extended-localstack::aws_eks_addon.core_dns
+bind eks_observability_addon = staging-extended-localstack::aws_eks_addon.observability
+bind eks_s3_irsa         = staging-extended-localstack::aws_iam_role.eks_service_accounts["s3"]
+bind eks_kinesis_irsa    = staging-extended-localstack::aws_iam_role.eks_service_accounts["kinesis"]
+bind eks_sqs_irsa        = staging-extended-localstack::aws_iam_role.eks_service_accounts["sqs"]
+bind eks_dynamodb_irsa   = staging-extended-localstack::aws_iam_role.eks_service_accounts["dynamodb"]
+bind redis_cache         = staging-extended-localstack::aws_cloudwatch_log_group.redis_cache
+bind kafka_backbone      = staging-extended-localstack::aws_cloudwatch_log_group.kafka_backbone
+
+bind lake_schedule       = staging-extended-localstack::aws_cloudwatch_event_rule.lake_curation
+bind lake_state_machine  = staging-extended-localstack::aws_sfn_state_machine.lake_curation
+bind glue_crawler        = staging-extended-localstack::aws_glue_crawler.raw
+bind glue_curator_job    = staging-extended-localstack::aws_glue_job.curate
+bind regional_writer_queue_east = staging-extended-localstack::aws_sqs_queue.regional_writer_east
+bind regional_writer_queue_west = staging-extended-localstack::aws_sqs_queue.regional_writer_west
+bind regional_writer_lambda_east = staging-extended-localstack::aws_lambda_function.regional_writer_east
+bind regional_dynamo_global = staging-extended-localstack::aws_dynamodb_table.regional_events_east
+bind regional_dynamo_west = staging-extended-localstack::aws_dynamodb_table.regional_events_west
+bind regional_rds_east   = staging-extended-localstack::module.regional_rds_east.aws_db_instance.this
+bind regional_rds_west   = staging-extended-localstack::module.regional_rds_west.aws_db_instance.this
+bind regional_aurora_east_2 = staging-extended-localstack::module.regional_aurora_east_2.aws_rds_cluster.this
+
+bind cloudtrail_org      = staging-extended-localstack::aws_cloudtrail.organization
+bind config_recorder     = staging-extended-localstack::aws_config_configuration_recorder.this
+bind security_hub        = staging-extended-localstack::aws_cloudwatch_log_group.security_hub_findings
+bind guardduty_detector  = staging-extended-localstack::aws_cloudwatch_log_group.guardduty_findings
+bind waf_acl             = staging-extended-localstack::aws_wafv2_web_acl.api
+bind ops_topic           = staging-extended-localstack::aws_sns_topic.ops
+bind ingest_dlq_alarm_ext = staging-extended-localstack::aws_cloudwatch_metric_alarm.ingest_dlq_depth
+bind kinesis_age_alarm   = staging-extended-localstack::aws_cloudwatch_metric_alarm.kinesis_iterator_age
+bind firehose_alarm      = staging-extended-localstack::aws_cloudwatch_metric_alarm.firehose_failures
+bind lambda_alarm        = staging-extended-localstack::aws_cloudwatch_metric_alarm.lambda_errors
+bind states_alarm        = staging-extended-localstack::aws_cloudwatch_metric_alarm.states_failures
+bind glue_alarm          = staging-extended-localstack::aws_cloudwatch_metric_alarm.glue_failures
+bind eks_alarm           = staging-extended-localstack::aws_cloudwatch_metric_alarm.eks_node_health
+bind platform_dashboard  = staging-extended-localstack::aws_cloudwatch_dashboard.extended
+
+# Inbound trunk
+east_igw -> ecs_alb
+ecs_alb -> ecs_listener
+ecs_listener -> ecs_target_group
+ecs_target_group -> ecs_producer
+
+# Ingress FIFO path
+ecs_producer -> event_queue
+event_queue -> queue_consumer
+event_queue -> ingress_dlq
+ingress_dlq -> ingress_dlq_alarm
+
+# Egress SQS -> ECS -> NAT
+queue_consumer -> egress_queue
+egress_queue -> network_egress_ecs
+egress_queue -> egress_dlq
+egress_dlq -> egress_dlq_alarm
+network_egress_ecs -> east_nat
+
+queue_consumer -> consumer_errors_alarm
+
+# Entry API fan-out (five gateways)
+queue_consumer -> api1_gateway, api2_gateway, api3_gateway, api4_gateway, api5_gateway
+
+# Gateway -> compute -> SSM + store
+api1_gateway -> api1_compute
+api2_gateway -> api2_compute
+api3_gateway -> api3_compute
+api4_gateway -> api4_compute
+api5_gateway -> api5_compute
+api6_gateway -> api6_compute
+api7_gateway -> api7_compute
+api8_gateway -> api8_compute
+api9_gateway -> api9_compute
+api10_gateway -> api10_compute
+api11_gateway -> api11_compute
+api12_gateway -> api12_compute
+api14_gateway -> api14_compute
+api15_gateway -> api15_compute
+api16_gateway -> api16_compute
+
+api1_compute -> api1_ssm_name, api1_store
+api2_compute -> api2_ssm_name, api2_store
+api3_compute -> api3_ssm_name, api3_store
+api4_compute -> api4_ssm_name, api4_store
+api5_compute -> api5_ssm_name, api5_store
+api6_compute -> api6_ssm_name, api6_store
+api7_compute -> api7_ssm_name, api7_store
+api8_compute -> api8_ssm_name, api8_store
+api9_compute -> api9_ssm_name, api9_store
+api10_compute -> api10_ssm_name, api10_store
+api11_compute -> api11_ssm_name, api11_store
+api12_compute -> api12_ssm_name, api12_store
+api14_compute -> api14_ssm_name, api14_store
+api15_compute -> api15_ssm_name, api15_store
+api16_compute -> api16_ssm_name, api16_store
+
+# Cascade: entry tier -> mid tier -> regional lanes
+api4_compute -> api6_gateway
+api5_compute -> api7_gateway
+api6_compute -> api8_gateway, api12_gateway, api15_gateway
+api7_compute -> api9_gateway
+api8_compute -> api10_gateway
+api9_compute -> api11_gateway
+api12_compute -> api14_gateway
+api15_compute -> api16_gateway
+
+# Extended ingest -> stream -> Kubernetes/lake -> regional persistence -> audit
+queue_consumer -> ingest_fifo_queue
+ingest_fifo_queue -> lake_ingestor_lambda
+ingest_fifo_queue -> ingest_fifo_dlq
+ingest_fifo_dlq -> ingest_dlq_alarm_ext
+lake_ingestor_lambda -> kinesis_data_stream, kinesis_burst_stream, sns_event_bus_topic
+kinesis_data_stream -> enhanced_consumer, firehose_raw_delivery, eks_cluster
+enhanced_consumer -> stream_processor_lambda
+stream_processor_lambda -> curated_lake_bucket, priority_standard_queue, regional_writer_queue_east
+firehose_raw_delivery -> raw_lake_bucket
+kinesis_burst_stream -> replay_fifo_queue
+sns_event_bus_topic -> priority_standard_queue, replay_fifo_queue, quarantine_queue
+quarantine_queue -> quarantine_bucket
+
+eks_cluster -> eks_node_group, eks_fargate_profile, eks_coredns_addon, eks_observability_addon
+eks_node_group -> eks_s3_irsa, eks_kinesis_irsa, eks_sqs_irsa, eks_dynamodb_irsa
+eks_node_group -> redis_cache, kafka_backbone, glue_curator_job
+eks_fargate_profile -> kinesis_data_stream, priority_standard_queue
+
+lake_schedule -> lake_state_machine
+lake_state_machine -> glue_crawler, glue_curator_job
+glue_crawler -> raw_lake_bucket
+glue_curator_job -> curated_lake_bucket, archive_lake_bucket
+raw_lake_bucket -> raw_replica_west
+curated_lake_bucket -> curated_replica_west_1
+archive_lake_bucket -> archive_replica_east_2
+
+glue_curator_job -> regional_writer_queue_east, regional_writer_queue_west
+regional_writer_queue_east -> regional_writer_lambda_east
+regional_writer_lambda_east -> regional_dynamo_global, regional_rds_east
+regional_writer_queue_west -> regional_dynamo_west, regional_rds_west
+regional_dynamo_global -> regional_aurora_east_2
+
+raw_lake_bucket -> cloudtrail_org
+curated_lake_bucket -> cloudtrail_org
+cloudtrail_org -> audit_bucket
+audit_bucket -> config_recorder, security_hub, guardduty_detector
+waf_acl -> ecs_alb
+ingest_dlq_alarm_ext -> ops_topic
+kinesis_age_alarm -> ops_topic
+firehose_alarm -> ops_topic
+lambda_alarm -> ops_topic
+states_alarm -> ops_topic
+glue_alarm -> ops_topic
+eks_alarm -> ops_topic
+ops_topic -> platform_dashboard
