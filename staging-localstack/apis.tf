@@ -26,38 +26,40 @@ module "api1" {
 module "api2" {
   source = "../staging-multi-state/modules/private_api_ecs"
 
-  name                   = "api-2"
-  environment            = local.environment
-  aws_region             = local.regions.east
-  aws_account_id         = local.aws_account_id
-  vpc_id                 = module.east_network.vpc_id
-  vpc_cidr               = local.vpc_cidrs.east
-  private_subnet_ids     = module.east_network.private_subnets
-  execute_api_vpce_id    = aws_vpc_endpoint.east_execute_api.id
-  execute_api_vpce_sg_id = module.east_network.interface_endpoint_security_group_id
-  launch_type            = "FARGATE"
-  db_secret_arn          = module.api2_rds.secret_arn
-  stage_name             = local.api_stage_name
-  tags                   = local.tags
+  name                             = "api-2"
+  environment                      = local.environment
+  aws_region                       = local.regions.east
+  aws_account_id                   = local.aws_account_id
+  vpc_id                           = module.east_network.vpc_id
+  vpc_cidr                         = local.vpc_cidrs.east
+  private_subnet_ids               = module.east_network.private_subnets
+  execute_api_vpce_id              = aws_vpc_endpoint.east_execute_api.id
+  execute_api_vpce_sg_id           = module.east_network.interface_endpoint_security_group_id
+  ecs_optimized_ami_parameter_name = "/localstack/service/ecs/optimized-ami/amazon-linux-2023/arm64/recommended"
+  launch_type                      = "FARGATE"
+  db_secret_arn                    = module.api2_rds.secret_arn
+  stage_name                       = local.api_stage_name
+  tags                             = local.tags
 }
 
 # api-3: ECS EC2 + Aurora (42-east-api-3)
 module "api3" {
   source = "../staging-multi-state/modules/private_api_ecs"
 
-  name                   = "api-3"
-  environment            = local.environment
-  aws_region             = local.regions.east
-  aws_account_id         = local.aws_account_id
-  vpc_id                 = module.east_network.vpc_id
-  vpc_cidr               = local.vpc_cidrs.east
-  private_subnet_ids     = module.east_network.private_subnets
-  execute_api_vpce_id    = aws_vpc_endpoint.east_execute_api.id
-  execute_api_vpce_sg_id = module.east_network.interface_endpoint_security_group_id
-  launch_type            = "FARGATE"
-  db_secret_arn          = module.api3_aurora.secret_arn
-  stage_name             = local.api_stage_name
-  tags                   = local.tags
+  name                             = "api-3"
+  environment                      = local.environment
+  aws_region                       = local.regions.east
+  aws_account_id                   = local.aws_account_id
+  vpc_id                           = module.east_network.vpc_id
+  vpc_cidr                         = local.vpc_cidrs.east
+  private_subnet_ids               = module.east_network.private_subnets
+  execute_api_vpce_id              = aws_vpc_endpoint.east_execute_api.id
+  execute_api_vpce_sg_id           = module.east_network.interface_endpoint_security_group_id
+  ecs_optimized_ami_parameter_name = "/localstack/service/ecs/optimized-ami/amazon-linux-2023/arm64/recommended"
+  launch_type                      = "EC2"
+  db_secret_arn                    = module.api3_aurora.secret_arn
+  stage_name                       = local.api_stage_name
+  tags                             = local.tags
 }
 
 # api-6: Lambda + RDS + downstream api8/api12/api15 (45-east-api-6)
@@ -90,17 +92,18 @@ module "api6" {
 module "api7" {
   source = "../staging-multi-state/modules/private_api_ecs"
 
-  name                   = "api-7"
-  environment            = local.environment
-  aws_region             = local.regions.east
-  aws_account_id         = local.aws_account_id
-  vpc_id                 = module.east_network.vpc_id
-  vpc_cidr               = local.vpc_cidrs.east
-  private_subnet_ids     = module.east_network.private_subnets
-  execute_api_vpce_id    = aws_vpc_endpoint.east_execute_api.id
-  execute_api_vpce_sg_id = module.east_network.interface_endpoint_security_group_id
-  launch_type            = "FARGATE"
-  db_secret_arn          = module.api7_aurora.secret_arn
+  name                             = "api-7"
+  environment                      = local.environment
+  aws_region                       = local.regions.east
+  aws_account_id                   = local.aws_account_id
+  vpc_id                           = module.east_network.vpc_id
+  vpc_cidr                         = local.vpc_cidrs.east
+  private_subnet_ids               = module.east_network.private_subnets
+  execute_api_vpce_id              = aws_vpc_endpoint.east_execute_api.id
+  execute_api_vpce_sg_id           = module.east_network.interface_endpoint_security_group_id
+  ecs_optimized_ami_parameter_name = "/localstack/service/ecs/optimized-ami/amazon-linux-2023/arm64/recommended"
+  launch_type                      = "EC2"
+  db_secret_arn                    = module.api7_aurora.secret_arn
   downstream_api_urls = {
     api9 = module.api9.api_invoke_url
   }
@@ -135,17 +138,18 @@ module "api4" {
 module "api5" {
   source = "../staging-multi-state/modules/private_api_ecs"
 
-  name                   = "api-5"
-  environment            = local.environment
-  aws_region             = local.regions.east
-  aws_account_id         = local.aws_account_id
-  vpc_id                 = module.east_network.vpc_id
-  vpc_cidr               = local.vpc_cidrs.east
-  private_subnet_ids     = module.east_network.private_subnets
-  execute_api_vpce_id    = aws_vpc_endpoint.east_execute_api.id
-  execute_api_vpce_sg_id = module.east_network.interface_endpoint_security_group_id
-  launch_type            = "FARGATE"
-  dynamodb_table_arn     = module.api5_table.arn
+  name                             = "api-5"
+  environment                      = local.environment
+  aws_region                       = local.regions.east
+  aws_account_id                   = local.aws_account_id
+  vpc_id                           = module.east_network.vpc_id
+  vpc_cidr                         = local.vpc_cidrs.east
+  private_subnet_ids               = module.east_network.private_subnets
+  execute_api_vpce_id              = aws_vpc_endpoint.east_execute_api.id
+  execute_api_vpce_sg_id           = module.east_network.interface_endpoint_security_group_id
+  ecs_optimized_ami_parameter_name = "/localstack/service/ecs/optimized-ami/amazon-linux-2023/arm64/recommended"
+  launch_type                      = "FARGATE"
+  dynamodb_table_arn               = module.api5_table.arn
   downstream_api_urls = {
     api7 = module.api7.api_invoke_url
   }
@@ -185,19 +189,20 @@ module "api11" {
 
   providers = { aws = aws.west }
 
-  name                   = "api-11"
-  environment            = local.environment
-  aws_region             = local.regions.west
-  aws_account_id         = local.aws_account_id
-  vpc_id                 = module.west_network.vpc_id
-  vpc_cidr               = local.vpc_cidrs.west
-  private_subnet_ids     = module.west_network.private_subnets
-  execute_api_vpce_id    = aws_vpc_endpoint.west_execute_api.id
-  execute_api_vpce_sg_id = module.west_network.interface_endpoint_security_group_id
-  launch_type            = "FARGATE"
-  db_secret_arn          = module.api11_aurora.secret_arn
-  stage_name             = local.api_stage_name
-  tags                   = local.tags
+  name                             = "api-11"
+  environment                      = local.environment
+  aws_region                       = local.regions.west
+  aws_account_id                   = local.aws_account_id
+  vpc_id                           = module.west_network.vpc_id
+  vpc_cidr                         = local.vpc_cidrs.west
+  private_subnet_ids               = module.west_network.private_subnets
+  execute_api_vpce_id              = aws_vpc_endpoint.west_execute_api.id
+  execute_api_vpce_sg_id           = module.west_network.interface_endpoint_security_group_id
+  ecs_optimized_ami_parameter_name = "/localstack/service/ecs/optimized-ami/amazon-linux-2023/arm64/recommended"
+  launch_type                      = "FARGATE"
+  db_secret_arn                    = module.api11_aurora.secret_arn
+  stage_name                       = local.api_stage_name
+  tags                             = local.tags
 }
 
 # api-8: ECS Fargate + S3 + downstream api10 (50-west-api-8)
@@ -206,17 +211,18 @@ module "api8" {
 
   providers = { aws = aws.west }
 
-  name                   = "api-8"
-  environment            = local.environment
-  aws_region             = local.regions.west
-  aws_account_id         = local.aws_account_id
-  vpc_id                 = module.west_network.vpc_id
-  vpc_cidr               = local.vpc_cidrs.west
-  private_subnet_ids     = module.west_network.private_subnets
-  execute_api_vpce_id    = aws_vpc_endpoint.west_execute_api.id
-  execute_api_vpce_sg_id = module.west_network.interface_endpoint_security_group_id
-  launch_type            = "FARGATE"
-  s3_bucket_arns         = [module.api8_west_bucket.bucket_arn]
+  name                             = "api-8"
+  environment                      = local.environment
+  aws_region                       = local.regions.west
+  aws_account_id                   = local.aws_account_id
+  vpc_id                           = module.west_network.vpc_id
+  vpc_cidr                         = local.vpc_cidrs.west
+  private_subnet_ids               = module.west_network.private_subnets
+  execute_api_vpce_id              = aws_vpc_endpoint.west_execute_api.id
+  execute_api_vpce_sg_id           = module.west_network.interface_endpoint_security_group_id
+  ecs_optimized_ami_parameter_name = "/localstack/service/ecs/optimized-ami/amazon-linux-2023/arm64/recommended"
+  launch_type                      = "FARGATE"
+  s3_bucket_arns                   = [module.api8_west_bucket.bucket_arn]
   downstream_api_urls = {
     api10 = module.api10.api_invoke_url
   }
@@ -230,17 +236,18 @@ module "api9" {
 
   providers = { aws = aws.west }
 
-  name                   = "api-9"
-  environment            = local.environment
-  aws_region             = local.regions.west
-  aws_account_id         = local.aws_account_id
-  vpc_id                 = module.west_network.vpc_id
-  vpc_cidr               = local.vpc_cidrs.west
-  private_subnet_ids     = module.west_network.private_subnets
-  execute_api_vpce_id    = aws_vpc_endpoint.west_execute_api.id
-  execute_api_vpce_sg_id = module.west_network.interface_endpoint_security_group_id
-  launch_type            = "FARGATE"
-  db_secret_arn          = module.api9_west_rds.secret_arn
+  name                             = "api-9"
+  environment                      = local.environment
+  aws_region                       = local.regions.west
+  aws_account_id                   = local.aws_account_id
+  vpc_id                           = module.west_network.vpc_id
+  vpc_cidr                         = local.vpc_cidrs.west
+  private_subnet_ids               = module.west_network.private_subnets
+  execute_api_vpce_id              = aws_vpc_endpoint.west_execute_api.id
+  execute_api_vpce_sg_id           = module.west_network.interface_endpoint_security_group_id
+  ecs_optimized_ami_parameter_name = "/localstack/service/ecs/optimized-ami/amazon-linux-2023/arm64/recommended"
+  launch_type                      = "EC2"
+  db_secret_arn                    = module.api9_west_rds.secret_arn
   downstream_api_urls = {
     api11 = module.api11.api_invoke_url
   }
@@ -258,19 +265,20 @@ module "api14" {
 
   providers = { aws = aws.west_1 }
 
-  name                   = "api-14"
-  environment            = local.environment
-  aws_region             = local.regions.west_1
-  aws_account_id         = local.aws_account_id
-  vpc_id                 = module.west_1_network.vpc_id
-  vpc_cidr               = local.vpc_cidrs.west_1
-  private_subnet_ids     = module.west_1_network.private_subnets
-  execute_api_vpce_id    = aws_vpc_endpoint.west_1_execute_api.id
-  execute_api_vpce_sg_id = module.west_1_network.interface_endpoint_security_group_id
-  launch_type            = "FARGATE"
-  dynamodb_table_arn     = module.api14_table.arn
-  stage_name             = local.api_stage_name
-  tags                   = local.tags
+  name                             = "api-14"
+  environment                      = local.environment
+  aws_region                       = local.regions.west_1
+  aws_account_id                   = local.aws_account_id
+  vpc_id                           = module.west_1_network.vpc_id
+  vpc_cidr                         = local.vpc_cidrs.west_1
+  private_subnet_ids               = module.west_1_network.private_subnets
+  execute_api_vpce_id              = aws_vpc_endpoint.west_1_execute_api.id
+  execute_api_vpce_sg_id           = module.west_1_network.interface_endpoint_security_group_id
+  ecs_optimized_ami_parameter_name = "/localstack/service/ecs/optimized-ami/amazon-linux-2023/arm64/recommended"
+  launch_type                      = "FARGATE"
+  dynamodb_table_arn               = module.api14_table.arn
+  stage_name                       = local.api_stage_name
+  tags                             = local.tags
 }
 
 # api-12: Lambda + S3 + downstream api14 (54-west-1-api-12)
@@ -330,17 +338,18 @@ module "api15" {
 
   providers = { aws = aws.east_2 }
 
-  name                   = "api-15"
-  environment            = local.environment
-  aws_region             = local.regions.east_2
-  aws_account_id         = local.aws_account_id
-  vpc_id                 = module.east_2_network.vpc_id
-  vpc_cidr               = local.vpc_cidrs.east_2
-  private_subnet_ids     = module.east_2_network.private_subnets
-  execute_api_vpce_id    = aws_vpc_endpoint.east_2_execute_api.id
-  execute_api_vpce_sg_id = module.east_2_network.interface_endpoint_security_group_id
-  launch_type            = "FARGATE"
-  db_secret_arn          = module.api15_aurora.secret_arn
+  name                             = "api-15"
+  environment                      = local.environment
+  aws_region                       = local.regions.east_2
+  aws_account_id                   = local.aws_account_id
+  vpc_id                           = module.east_2_network.vpc_id
+  vpc_cidr                         = local.vpc_cidrs.east_2
+  private_subnet_ids               = module.east_2_network.private_subnets
+  execute_api_vpce_id              = aws_vpc_endpoint.east_2_execute_api.id
+  execute_api_vpce_sg_id           = module.east_2_network.interface_endpoint_security_group_id
+  ecs_optimized_ami_parameter_name = "/localstack/service/ecs/optimized-ami/amazon-linux-2023/arm64/recommended"
+  launch_type                      = "EC2"
+  db_secret_arn                    = module.api15_aurora.secret_arn
   downstream_api_urls = {
     api16 = "https://${module.api16.api_id}-${aws_vpc_endpoint.east_2_execute_api.id}.execute-api.${local.regions.east_2}.amazonaws.com/${local.api_stage_name}/invoke"
   }

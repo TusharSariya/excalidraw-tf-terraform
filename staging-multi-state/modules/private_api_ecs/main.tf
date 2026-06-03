@@ -264,7 +264,7 @@ resource "aws_ecs_cluster_capacity_providers" "api" {
 data "aws_ssm_parameter" "ecs_optimized_ami" {
   count = local.use_ec2 ? 1 : 0
 
-  name = "/aws/service/ecs/optimized-ami/amazon-linux-2023/arm64/recommended"
+  name = var.ecs_optimized_ami_parameter_name
 }
 
 locals {
@@ -373,10 +373,11 @@ resource "aws_ecs_task_definition" "api" {
 
   container_definitions = jsonencode([
     {
-      name      = "api"
-      image     = var.container_image
-      essential = true
-      command   = ["python", "-u", "-c", file("${path.module}/../../shared/api_server.py")]
+      name              = "api"
+      image             = var.container_image
+      essential         = true
+      memoryReservation = 256
+      command           = ["python", "-u", "-c", file("${path.module}/../../shared/api_server.py")]
       portMappings = [
         {
           containerPort = var.container_port
@@ -410,7 +411,8 @@ resource "aws_ecs_service" "api" {
   task_definition = aws_ecs_task_definition.api.arn
   desired_count   = var.desired_count
 
-  launch_type = local.use_ec2 ? null : "FARGATE"
+  launch_type          = local.use_ec2 ? null : "FARGATE"
+  force_new_deployment = true
 
   dynamic "capacity_provider_strategy" {
     for_each = local.use_ec2 ? [1] : []

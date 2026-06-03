@@ -4,6 +4,13 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
+if [[ -f "$ROOT/.env.local" ]]; then
+  set -a
+  # shellcheck disable=SC1091
+  source "$ROOT/.env.local"
+  set +a
+fi
+
 CONTAINER_NAME="${LOCALSTACK_CONTAINER_NAME:-staging-localstack-localstack}"
 IMAGE="${LOCALSTACK_IMAGE:-localstack/localstack:2026.05.0}"
 VOLUME="${LOCALSTACK_VOLUME:-localstack_staging-localstack-data}"

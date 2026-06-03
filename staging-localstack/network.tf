@@ -87,7 +87,7 @@ module "east_lambda_artifacts" {
     }
   }
 
-  attach_deny_insecure_transport_policy = false
+  attach_deny_insecure_transport_policy = true
 
   tags = merge(local.tags, { purpose = "lambda-artifacts" })
 }
@@ -192,7 +192,7 @@ module "west_lambda_artifacts" {
     }
   }
 
-  attach_deny_insecure_transport_policy = false
+  attach_deny_insecure_transport_policy = true
 
   tags = merge(local.tags, { purpose = "lambda-artifacts" })
 }
@@ -381,7 +381,7 @@ module "east_2_lambda_artifacts" {
     }
   }
 
-  attach_deny_insecure_transport_policy = false
+  attach_deny_insecure_transport_policy = true
 
   tags = merge(local.tags, { purpose = "lambda-artifacts" })
 }
@@ -590,8 +590,9 @@ resource "aws_route" "east_db_to_east_2" {
 
 resource "aws_route" "west_hub_to_east_2" {
   provider = aws.west
+  for_each = module.west_network.route_table_id_map
 
-  route_table_id         = module.west_network.private_route_table_ids[0]
+  route_table_id         = each.value
   destination_cidr_block = local.vpc_cidrs.east_2
   transit_gateway_id     = aws_ec2_transit_gateway.west.id
 }
@@ -681,7 +682,7 @@ module "west_1_lambda_artifacts" {
     }
   }
 
-  attach_deny_insecure_transport_policy = false
+  attach_deny_insecure_transport_policy = true
 
   tags = merge(local.tags, { purpose = "lambda-artifacts" })
 }
@@ -933,32 +934,33 @@ resource "aws_route" "east_db_to_west_1" {
 
 resource "aws_route" "west_hub_to_west_1" {
   provider = aws.west
+  for_each = module.west_network.route_table_id_map
 
-  route_table_id         = module.west_network.private_route_table_ids[0]
+  route_table_id         = each.value
   destination_cidr_block = local.vpc_cidrs.west_1
   transit_gateway_id     = aws_ec2_transit_gateway.west.id
 }
 
-resource "aws_route" "east_2_private_to_west_1_from_west_1" {
+resource "aws_route" "east_2_public_to_west_1_from_west_1" {
   provider = aws.east_2
 
-  route_table_id         = module.east_2_network.private_route_table_ids[0]
+  route_table_id         = module.east_2_network.public_route_table_ids[0]
   destination_cidr_block = local.vpc_cidrs.west_1
   transit_gateway_id     = aws_ec2_transit_gateway.east_2.id
 }
 
-resource "aws_route" "east_2_intra_to_west_1_from_west_1" {
+resource "aws_route" "east_2_default_to_west_1_from_west_1" {
   provider = aws.east_2
 
-  route_table_id         = module.east_2_network.intra_route_table_ids[0]
+  route_table_id         = module.east_2_network.default_route_table_id
   destination_cidr_block = local.vpc_cidrs.west_1
   transit_gateway_id     = aws_ec2_transit_gateway.east_2.id
 }
 
-resource "aws_route" "east_2_db_to_west_1_from_west_1" {
-  provider = aws.east_2
+resource "aws_route" "west_1_default_to_east_2_from_east_2" {
+  provider = aws.west_1
 
-  route_table_id         = module.east_2_network.database_route_table_ids[0]
-  destination_cidr_block = local.vpc_cidrs.west_1
-  transit_gateway_id     = aws_ec2_transit_gateway.east_2.id
+  route_table_id         = module.west_1_network.default_route_table_id
+  destination_cidr_block = local.vpc_cidrs.east_2
+  transit_gateway_id     = aws_ec2_transit_gateway.west_1.id
 }

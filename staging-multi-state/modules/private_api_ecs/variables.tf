@@ -64,6 +64,12 @@ variable "desired_count" {
   default = 2
 }
 
+variable "ecs_optimized_ami_parameter_name" {
+  type        = string
+  description = "SSM parameter containing ECS optimized AMI metadata for EC2 launch type."
+  default     = "/aws/service/ecs/optimized-ami/amazon-linux-2023/arm64/recommended"
+}
+
 variable "dynamodb_table_arn" {
   type    = string
   default = ""

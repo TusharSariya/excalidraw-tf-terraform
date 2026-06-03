@@ -46,6 +46,7 @@ provider "aws" {
     ecr                      = local.localstack_ep
     ecs                      = local.localstack_ep
     elasticloadbalancing     = local.localstack_ep
+    elasticloadbalancingv2   = local.localstack_ep
     iam                      = local.localstack_ep
     kms                      = local.localstack_ep
     lambda                   = local.localstack_ep
@@ -90,6 +91,7 @@ provider "aws" {
     ecr                      = local.localstack_ep
     ecs                      = local.localstack_ep
     elasticloadbalancing     = local.localstack_ep
+    elasticloadbalancingv2   = local.localstack_ep
     iam                      = local.localstack_ep
     kms                      = local.localstack_ep
     lambda                   = local.localstack_ep
@@ -134,6 +136,7 @@ provider "aws" {
     ecr                      = local.localstack_ep
     ecs                      = local.localstack_ep
     elasticloadbalancing     = local.localstack_ep
+    elasticloadbalancingv2   = local.localstack_ep
     iam                      = local.localstack_ep
     kms                      = local.localstack_ep
     lambda                   = local.localstack_ep
@@ -178,6 +181,7 @@ provider "aws" {
     ecr                      = local.localstack_ep
     ecs                      = local.localstack_ep
     elasticloadbalancing     = local.localstack_ep
+    elasticloadbalancingv2   = local.localstack_ep
     iam                      = local.localstack_ep
     kms                      = local.localstack_ep
     lambda                   = local.localstack_ep

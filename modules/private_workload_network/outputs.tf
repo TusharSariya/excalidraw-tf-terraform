@@ -33,6 +33,16 @@ output "public_subnets" {
   value       = module.vpc.public_subnets
 }
 
+output "public_route_table_ids" {
+  description = "Route tables associated with public subnets."
+  value       = module.vpc.public_route_table_ids
+}
+
+output "default_route_table_id" {
+  description = "Default route table for the VPC."
+  value       = module.vpc.default_route_table_id
+}
+
 output "nat_gateway_public_ips" {
   description = "Elastic IP addresses associated with NAT gateways (one per NAT created)."
   value       = module.vpc.nat_public_ips
@@ -46,6 +56,28 @@ output "intra_route_table_ids" {
 output "private_route_table_ids" {
   description = "Route tables associated with private subnets."
   value       = module.vpc.private_route_table_ids
+}
+
+output "route_table_ids" {
+  description = "All VPC route tables created by the workload network module."
+  value = distinct(concat(
+    [module.vpc.default_route_table_id],
+    module.vpc.public_route_table_ids,
+    module.vpc.private_route_table_ids,
+    module.vpc.intra_route_table_ids,
+    module.vpc.database_route_table_ids,
+  ))
+}
+
+output "route_table_id_map" {
+  description = "All VPC route tables keyed by stable tier names for same-apply for_each use."
+  value = {
+    default  = module.vpc.default_route_table_id
+    public   = module.vpc.public_route_table_ids[0]
+    private  = module.vpc.private_route_table_ids[0]
+    intra    = module.vpc.intra_route_table_ids[0]
+    database = module.vpc.database_route_table_ids[0]
+  }
 }
 
 output "interface_endpoint_security_group_id" {
