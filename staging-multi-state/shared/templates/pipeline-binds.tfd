@@ -1,0 +1,45 @@
+tfd 2
+# Section 7 — expansion APIs 12–16 (us-west-1 + us-east-2)
+# Append to pipeline.tfd or import alongside the base 11-API graph.
+
+# Gateways
+bind api12_gateway = 54-west-1-api-12::module.api.aws_api_gateway_rest_api.private
+bind api14_gateway = 55-west-1-api-14::module.api.aws_api_gateway_rest_api.private
+bind api15_gateway = 56-east-2-api-15::module.api.aws_api_gateway_rest_api.private
+bind api16_gateway = 57-east-2-api-16::module.api.aws_api_gateway_rest_api.private
+
+# Compute
+bind api12_compute = 54-west-1-api-12::module.api.module.lambda_service.module.lambda.aws_lambda_function.this[0]
+bind api14_compute = 55-west-1-api-14::module.api.aws_ecs_service.api
+bind api15_compute = 56-east-2-api-15::module.api.aws_ecs_service.api
+bind api16_compute = 57-east-2-api-16::module.api.module.lambda_service.module.lambda.aws_lambda_function.this[0]
+
+# SSM config parameters
+bind api12_ssm_name = 54-west-1-api-12::module.api.aws_ssm_parameter.api_name
+bind api14_ssm_name = 55-west-1-api-14::module.api.aws_ssm_parameter.api_name
+bind api15_ssm_name = 56-east-2-api-15::module.api.aws_ssm_parameter.api_name
+bind api16_ssm_name = 57-east-2-api-16::module.api.aws_ssm_parameter.api_name
+
+# Dedicated datastores (04-west-1-datastores / 05-east-2-datastores)
+bind api12_store = 04-west-1-datastores::module.api12_bucket.module.bucket.module.bucket.aws_s3_bucket.this[0]
+bind api14_store = 04-west-1-datastores::module.api14_table.aws_dynamodb_table.this
+bind api15_store = 05-east-2-datastores::module.api15_aurora.aws_rds_cluster.this
+bind api16_store = 05-east-2-datastores::module.api16_rds.aws_db_instance.this
+
+# Gateway -> compute -> SSM + store
+api12_gateway -> api12_compute
+api14_gateway -> api14_compute
+api15_gateway -> api15_compute
+api16_gateway -> api16_compute
+
+api12_compute -> api12_ssm_name, api12_store
+api14_compute -> api14_ssm_name, api14_store
+api15_compute -> api15_ssm_name, api15_store
+api16_compute -> api16_ssm_name, api16_store
+
+# Regional cascade (west-1 branch + east-2 branch)
+api12_compute -> api14_gateway
+api15_compute -> api16_gateway
+
+# Optional trunk extension: tail tier west-1 entry (uncomment when wired)
+# api11_compute -> api12_gateway
