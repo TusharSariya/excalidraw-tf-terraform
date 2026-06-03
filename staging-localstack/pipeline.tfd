@@ -1,0 +1,158 @@
+tfd 2
+# Pipeline-wide declared dataflow for staging-localstack.
+# Single-state replica of staging-multi-state: same topology, one Terraform root.
+# All binds use the single stack ID "staging-localstack".
+
+# Hub network ingress / egress
+bind east_igw            = staging-localstack::module.east_network.module.vpc.aws_internet_gateway.this[0]
+bind east_nat            = staging-localstack::module.east_network.module.vpc.aws_nat_gateway.this[0]
+
+# ECS ingress + producer + queues + consumer + egress worker
+bind ecs_alb             = staging-localstack::aws_lb.ecs
+bind ecs_listener        = staging-localstack::aws_lb_listener.http
+bind ecs_target_group    = staging-localstack::aws_lb_target_group.ecs
+bind ecs_producer        = staging-localstack::aws_ecs_service.producer
+bind event_queue         = staging-localstack::module.ingress_queue.module.queue.aws_sqs_queue.this[0]
+bind ingress_dlq         = staging-localstack::module.ingress_queue.module.queue.aws_sqs_queue.dlq[0]
+bind egress_queue        = staging-localstack::module.egress_queue.module.queue.aws_sqs_queue.this[0]
+bind egress_dlq          = staging-localstack::module.egress_queue.module.queue.aws_sqs_queue.dlq[0]
+bind queue_consumer      = staging-localstack::module.consumer_lambda.module.lambda.aws_lambda_function.this[0]
+bind network_egress_ecs  = staging-localstack::aws_ecs_service.egress
+bind ingress_dlq_alarm   = staging-localstack::module.ingress_queue.aws_cloudwatch_metric_alarm.dlq_visible_messages[0]
+bind egress_dlq_alarm    = staging-localstack::module.egress_queue.aws_cloudwatch_metric_alarm.dlq_visible_messages[0]
+bind consumer_errors_alarm = staging-localstack::module.consumer_lambda.aws_cloudwatch_metric_alarm.lambda_errors[0]
+
+# API Gateway front doors
+bind api1_gateway        = staging-localstack::module.api1.aws_api_gateway_rest_api.private
+bind api2_gateway        = staging-localstack::module.api2.aws_api_gateway_rest_api.private
+bind api3_gateway        = staging-localstack::module.api3.aws_api_gateway_rest_api.private
+bind api4_gateway        = staging-localstack::module.api4.aws_api_gateway_rest_api.private
+bind api5_gateway        = staging-localstack::module.api5.aws_api_gateway_rest_api.private
+bind api6_gateway        = staging-localstack::module.api6.aws_api_gateway_rest_api.private
+bind api7_gateway        = staging-localstack::module.api7.aws_api_gateway_rest_api.private
+bind api8_gateway        = staging-localstack::module.api8.aws_api_gateway_rest_api.private
+bind api9_gateway        = staging-localstack::module.api9.aws_api_gateway_rest_api.private
+bind api10_gateway       = staging-localstack::module.api10.aws_api_gateway_rest_api.private
+bind api11_gateway       = staging-localstack::module.api11.aws_api_gateway_rest_api.private
+bind api12_gateway       = staging-localstack::module.api12.aws_api_gateway_rest_api.private
+bind api14_gateway       = staging-localstack::module.api14.aws_api_gateway_rest_api.private
+bind api15_gateway       = staging-localstack::module.api15.aws_api_gateway_rest_api.private
+bind api16_gateway       = staging-localstack::module.api16.aws_api_gateway_rest_api.private
+
+# Compute: Lambda (1,4,6,10,12,16) or ECS service (2,3,5,7,8,9,11,14,15)
+bind api1_compute        = staging-localstack::module.api1.module.lambda_service.module.lambda.aws_lambda_function.this[0]
+bind api2_compute        = staging-localstack::module.api2.aws_ecs_service.api
+bind api3_compute        = staging-localstack::module.api3.aws_ecs_service.api
+bind api4_compute        = staging-localstack::module.api4.module.lambda_service.module.lambda.aws_lambda_function.this[0]
+bind api5_compute        = staging-localstack::module.api5.aws_ecs_service.api
+bind api6_compute        = staging-localstack::module.api6.module.lambda_service.module.lambda.aws_lambda_function.this[0]
+bind api7_compute        = staging-localstack::module.api7.aws_ecs_service.api
+bind api8_compute        = staging-localstack::module.api8.aws_ecs_service.api
+bind api9_compute        = staging-localstack::module.api9.aws_ecs_service.api
+bind api10_compute       = staging-localstack::module.api10.module.lambda_service.module.lambda.aws_lambda_function.this[0]
+bind api11_compute       = staging-localstack::module.api11.aws_ecs_service.api
+bind api12_compute       = staging-localstack::module.api12.module.lambda_service.module.lambda.aws_lambda_function.this[0]
+bind api14_compute       = staging-localstack::module.api14.aws_ecs_service.api
+bind api15_compute       = staging-localstack::module.api15.aws_ecs_service.api
+bind api16_compute       = staging-localstack::module.api16.module.lambda_service.module.lambda.aws_lambda_function.this[0]
+
+# SSM config parameters
+bind api1_ssm_name       = staging-localstack::module.api1.aws_ssm_parameter.api_name
+bind api2_ssm_name       = staging-localstack::module.api2.aws_ssm_parameter.api_name
+bind api3_ssm_name       = staging-localstack::module.api3.aws_ssm_parameter.api_name
+bind api4_ssm_name       = staging-localstack::module.api4.aws_ssm_parameter.api_name
+bind api5_ssm_name       = staging-localstack::module.api5.aws_ssm_parameter.api_name
+bind api6_ssm_name       = staging-localstack::module.api6.aws_ssm_parameter.api_name
+bind api7_ssm_name       = staging-localstack::module.api7.aws_ssm_parameter.api_name
+bind api8_ssm_name       = staging-localstack::module.api8.aws_ssm_parameter.api_name
+bind api9_ssm_name       = staging-localstack::module.api9.aws_ssm_parameter.api_name
+bind api10_ssm_name      = staging-localstack::module.api10.aws_ssm_parameter.api_name
+bind api11_ssm_name      = staging-localstack::module.api11.aws_ssm_parameter.api_name
+bind api12_ssm_name      = staging-localstack::module.api12.aws_ssm_parameter.api_name
+bind api14_ssm_name      = staging-localstack::module.api14.aws_ssm_parameter.api_name
+bind api15_ssm_name      = staging-localstack::module.api15.aws_ssm_parameter.api_name
+bind api16_ssm_name      = staging-localstack::module.api16.aws_ssm_parameter.api_name
+
+# Dedicated datastores
+bind api1_store          = staging-localstack::module.api1_table.aws_dynamodb_table.this
+bind api2_store          = staging-localstack::module.api2_rds.aws_db_instance.this
+bind api3_store          = staging-localstack::module.api3_aurora.aws_rds_cluster.this
+bind api4_store          = staging-localstack::module.api4_bucket.module.bucket.module.bucket.aws_s3_bucket.this[0]
+bind api5_store          = staging-localstack::module.api5_table.aws_dynamodb_table.this
+bind api6_store          = staging-localstack::module.api6_rds.aws_db_instance.this
+bind api7_store          = staging-localstack::module.api7_aurora.aws_rds_cluster.this
+bind api8_store          = staging-localstack::module.api8_west_bucket.module.bucket.module.bucket.aws_s3_bucket.this[0]
+bind api9_store          = staging-localstack::module.api9_west_rds.aws_db_instance.this
+bind api10_store         = staging-localstack::module.api10_table.aws_dynamodb_table.this
+bind api11_store         = staging-localstack::module.api11_aurora.aws_rds_cluster.this
+bind api12_store         = staging-localstack::module.api12_bucket.module.bucket.module.bucket.aws_s3_bucket.this[0]
+bind api14_store         = staging-localstack::module.api14_table.aws_dynamodb_table.this
+bind api15_store         = staging-localstack::module.api15_aurora.aws_rds_cluster.this
+bind api16_store         = staging-localstack::module.api16_rds.aws_db_instance.this
+
+# Inbound trunk
+east_igw -> ecs_alb
+ecs_alb -> ecs_listener
+ecs_listener -> ecs_target_group
+ecs_target_group -> ecs_producer
+
+# Ingress FIFO path
+ecs_producer -> event_queue
+event_queue -> queue_consumer
+event_queue -> ingress_dlq
+ingress_dlq -> ingress_dlq_alarm
+
+# Egress SQS -> ECS -> NAT
+queue_consumer -> egress_queue
+egress_queue -> network_egress_ecs
+egress_queue -> egress_dlq
+egress_dlq -> egress_dlq_alarm
+network_egress_ecs -> east_nat
+
+queue_consumer -> consumer_errors_alarm
+
+# Entry API fan-out (five gateways)
+queue_consumer -> api1_gateway, api2_gateway, api3_gateway, api4_gateway, api5_gateway
+
+# Gateway -> compute -> SSM + store
+api1_gateway -> api1_compute
+api2_gateway -> api2_compute
+api3_gateway -> api3_compute
+api4_gateway -> api4_compute
+api5_gateway -> api5_compute
+api6_gateway -> api6_compute
+api7_gateway -> api7_compute
+api8_gateway -> api8_compute
+api9_gateway -> api9_compute
+api10_gateway -> api10_compute
+api11_gateway -> api11_compute
+api12_gateway -> api12_compute
+api14_gateway -> api14_compute
+api15_gateway -> api15_compute
+api16_gateway -> api16_compute
+
+api1_compute -> api1_ssm_name, api1_store
+api2_compute -> api2_ssm_name, api2_store
+api3_compute -> api3_ssm_name, api3_store
+api4_compute -> api4_ssm_name, api4_store
+api5_compute -> api5_ssm_name, api5_store
+api6_compute -> api6_ssm_name, api6_store
+api7_compute -> api7_ssm_name, api7_store
+api8_compute -> api8_ssm_name, api8_store
+api9_compute -> api9_ssm_name, api9_store
+api10_compute -> api10_ssm_name, api10_store
+api11_compute -> api11_ssm_name, api11_store
+api12_compute -> api12_ssm_name, api12_store
+api14_compute -> api14_ssm_name, api14_store
+api15_compute -> api15_ssm_name, api15_store
+api16_compute -> api16_ssm_name, api16_store
+
+# Cascade: entry tier -> mid tier -> regional lanes
+api4_compute -> api6_gateway
+api5_compute -> api7_gateway
+api6_compute -> api8_gateway, api12_gateway, api15_gateway
+api7_compute -> api9_gateway
+api8_compute -> api10_gateway
+api9_compute -> api11_gateway
+api12_compute -> api14_gateway
+api15_compute -> api16_gateway
