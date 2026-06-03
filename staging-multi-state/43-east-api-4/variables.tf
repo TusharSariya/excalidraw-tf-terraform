@@ -47,3 +47,16 @@ variable "east_api7_state_path" {
   type    = string
   default = "../46-east-api-7/terraform.tfstate"
 }
+
+variable "use_localstack" {
+  type        = bool
+  description = "Route AWS provider calls for this stack to LocalStack instead of AWS."
+  default     = false
+}
+
+variable "localstack_endpoint" {
+  type        = string
+  description = "LocalStack edge endpoint used when use_localstack is true."
+  default     = "http://localhost:4566"
+}
+

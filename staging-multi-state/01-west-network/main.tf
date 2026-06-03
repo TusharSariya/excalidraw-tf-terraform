@@ -28,8 +28,38 @@ locals {
 provider "aws" {
   alias   = "west"
   region  = var.aws_region
-  profile = var.aws_profile
+  profile = var.use_localstack ? null : var.aws_profile
 
+
+  access_key                  = var.use_localstack ? "test" : null
+  secret_key                  = var.use_localstack ? "test" : null
+  skip_credentials_validation = var.use_localstack
+  skip_metadata_api_check     = var.use_localstack
+  skip_region_validation      = var.use_localstack
+  s3_use_path_style           = var.use_localstack
+
+  endpoints {
+    apigateway               = var.use_localstack ? var.localstack_endpoint : null
+    applicationautoscaling   = var.use_localstack ? var.localstack_endpoint : null
+    autoscaling              = var.use_localstack ? var.localstack_endpoint : null
+    cloudwatch               = var.use_localstack ? var.localstack_endpoint : null
+    cloudwatchlogs           = var.use_localstack ? var.localstack_endpoint : null
+    dynamodb                 = var.use_localstack ? var.localstack_endpoint : null
+    ec2                      = var.use_localstack ? var.localstack_endpoint : null
+    ecr                      = var.use_localstack ? var.localstack_endpoint : null
+    ecs                      = var.use_localstack ? var.localstack_endpoint : null
+    elasticloadbalancing     = var.use_localstack ? var.localstack_endpoint : null
+    iam                      = var.use_localstack ? var.localstack_endpoint : null
+    kms                      = var.use_localstack ? var.localstack_endpoint : null
+    lambda                   = var.use_localstack ? var.localstack_endpoint : null
+    rds                      = var.use_localstack ? var.localstack_endpoint : null
+    resourcegroupstaggingapi = var.use_localstack ? var.localstack_endpoint : null
+    s3                       = var.use_localstack ? var.localstack_endpoint : null
+    secretsmanager           = var.use_localstack ? var.localstack_endpoint : null
+    sqs                      = var.use_localstack ? var.localstack_endpoint : null
+    ssm                      = var.use_localstack ? var.localstack_endpoint : null
+    sts                      = var.use_localstack ? var.localstack_endpoint : null
+  }
   assume_role {
     role_arn     = local.terraform_deploy_role_arn
     session_name = "terraform-staging-west-network"
@@ -43,8 +73,38 @@ provider "aws" {
 provider "aws" {
   alias   = "east"
   region  = var.east_region
-  profile = var.aws_profile
+  profile = var.use_localstack ? null : var.aws_profile
 
+
+  access_key                  = var.use_localstack ? "test" : null
+  secret_key                  = var.use_localstack ? "test" : null
+  skip_credentials_validation = var.use_localstack
+  skip_metadata_api_check     = var.use_localstack
+  skip_region_validation      = var.use_localstack
+  s3_use_path_style           = var.use_localstack
+
+  endpoints {
+    apigateway               = var.use_localstack ? var.localstack_endpoint : null
+    applicationautoscaling   = var.use_localstack ? var.localstack_endpoint : null
+    autoscaling              = var.use_localstack ? var.localstack_endpoint : null
+    cloudwatch               = var.use_localstack ? var.localstack_endpoint : null
+    cloudwatchlogs           = var.use_localstack ? var.localstack_endpoint : null
+    dynamodb                 = var.use_localstack ? var.localstack_endpoint : null
+    ec2                      = var.use_localstack ? var.localstack_endpoint : null
+    ecr                      = var.use_localstack ? var.localstack_endpoint : null
+    ecs                      = var.use_localstack ? var.localstack_endpoint : null
+    elasticloadbalancing     = var.use_localstack ? var.localstack_endpoint : null
+    iam                      = var.use_localstack ? var.localstack_endpoint : null
+    kms                      = var.use_localstack ? var.localstack_endpoint : null
+    lambda                   = var.use_localstack ? var.localstack_endpoint : null
+    rds                      = var.use_localstack ? var.localstack_endpoint : null
+    resourcegroupstaggingapi = var.use_localstack ? var.localstack_endpoint : null
+    s3                       = var.use_localstack ? var.localstack_endpoint : null
+    secretsmanager           = var.use_localstack ? var.localstack_endpoint : null
+    sqs                      = var.use_localstack ? var.localstack_endpoint : null
+    ssm                      = var.use_localstack ? var.localstack_endpoint : null
+    sts                      = var.use_localstack ? var.localstack_endpoint : null
+  }
   assume_role {
     role_arn     = local.terraform_deploy_role_arn
     session_name = "terraform-staging-west-network-east"
@@ -80,13 +140,13 @@ module "west_network" {
     aws = aws.west
   }
 
-  vpc_name             = var.vpc_name
-  vpc_cidr             = var.vpc_cidr
-  public_subnet_cidrs  = var.public_subnet_cidrs
-  private_subnet_cidrs = var.private_subnet_cidrs
-  intra_subnet_cidrs     = var.intra_subnet_cidrs
-  database_subnet_cidrs  = var.database_subnet_cidrs
-  single_nat_gateway     = var.single_nat_gateway
+  vpc_name              = var.vpc_name
+  vpc_cidr              = var.vpc_cidr
+  public_subnet_cidrs   = var.public_subnet_cidrs
+  private_subnet_cidrs  = var.private_subnet_cidrs
+  intra_subnet_cidrs    = var.intra_subnet_cidrs
+  database_subnet_cidrs = var.database_subnet_cidrs
+  single_nat_gateway    = var.single_nat_gateway
 
   interface_endpoint_security_group_name = "${var.vpc_name}-vpce-sg"
   flow_logs_log_group_name               = "/aws/vpc/${var.vpc_name}/flow"

@@ -37,3 +37,16 @@ variable "east_2_datastores_state_path" {
   type    = string
   default = "../05-east-2-datastores/terraform.tfstate"
 }
+
+variable "use_localstack" {
+  type        = bool
+  description = "Route AWS provider calls for this stack to LocalStack instead of AWS."
+  default     = false
+}
+
+variable "localstack_endpoint" {
+  type        = string
+  description = "LocalStack edge endpoint used when use_localstack is true."
+  default     = "http://localhost:4566"
+}
+

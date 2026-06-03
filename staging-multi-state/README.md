@@ -44,3 +44,26 @@ yarn hydrate:terraform-preset staging-multi-state-expanded
 Pipeline dataflow: `pipeline.tfd`. Import preset: **`staging-multi-state-expanded`** (25 stacks).
 
 All states default to AWS profile `admin` and support optional assume-role via `terraform_deploy_role_arn`.
+
+## LocalStack
+
+The same stack roots can target LocalStack by setting `USE_LOCALSTACK=1` or
+`TF_VAR_use_localstack=true`. This keeps local state files and remote-state
+dependencies unchanged, but points every AWS provider at the LocalStack edge
+endpoint and uses fake `test` credentials.
+
+Start LocalStack:
+
+```bash
+cd packages/backend/terraform/staging-multi-state
+LOCALSTACK_AUTH_TOKEN=... ./scripts/start-localstack.sh
+```
+
+Apply against LocalStack:
+
+```bash
+USE_LOCALSTACK=1 ./scripts/apply-and-export-all.sh
+```
+
+The default LocalStack endpoint is `http://localhost:4566`; override it with
+`TF_VAR_localstack_endpoint` when Terraform runs from a container.

@@ -22,8 +22,38 @@ locals {
 
 provider "aws" {
   region  = var.aws_region
-  profile = var.aws_profile
+  profile = var.use_localstack ? null : var.aws_profile
 
+
+  access_key                  = var.use_localstack ? "test" : null
+  secret_key                  = var.use_localstack ? "test" : null
+  skip_credentials_validation = var.use_localstack
+  skip_metadata_api_check     = var.use_localstack
+  skip_region_validation      = var.use_localstack
+  s3_use_path_style           = var.use_localstack
+
+  endpoints {
+    apigateway               = var.use_localstack ? var.localstack_endpoint : null
+    applicationautoscaling   = var.use_localstack ? var.localstack_endpoint : null
+    autoscaling              = var.use_localstack ? var.localstack_endpoint : null
+    cloudwatch               = var.use_localstack ? var.localstack_endpoint : null
+    cloudwatchlogs           = var.use_localstack ? var.localstack_endpoint : null
+    dynamodb                 = var.use_localstack ? var.localstack_endpoint : null
+    ec2                      = var.use_localstack ? var.localstack_endpoint : null
+    ecr                      = var.use_localstack ? var.localstack_endpoint : null
+    ecs                      = var.use_localstack ? var.localstack_endpoint : null
+    elasticloadbalancing     = var.use_localstack ? var.localstack_endpoint : null
+    iam                      = var.use_localstack ? var.localstack_endpoint : null
+    kms                      = var.use_localstack ? var.localstack_endpoint : null
+    lambda                   = var.use_localstack ? var.localstack_endpoint : null
+    rds                      = var.use_localstack ? var.localstack_endpoint : null
+    resourcegroupstaggingapi = var.use_localstack ? var.localstack_endpoint : null
+    s3                       = var.use_localstack ? var.localstack_endpoint : null
+    secretsmanager           = var.use_localstack ? var.localstack_endpoint : null
+    sqs                      = var.use_localstack ? var.localstack_endpoint : null
+    ssm                      = var.use_localstack ? var.localstack_endpoint : null
+    sts                      = var.use_localstack ? var.localstack_endpoint : null
+  }
   assume_role {
     role_arn     = local.terraform_deploy_role_arn
     session_name = "terraform-staging-west-api-9"
@@ -75,7 +105,7 @@ module "api" {
   execute_api_vpce_id    = data.terraform_remote_state.west_network.outputs.execute_api_vpce_id
   execute_api_vpce_sg_id = data.terraform_remote_state.west_network.outputs.execute_api_vpce_sg_id
   launch_type            = "EC2"
-  db_secret_arn = data.terraform_remote_state.west_datastores.outputs.api9_west_secret_arn
+  db_secret_arn          = data.terraform_remote_state.west_datastores.outputs.api9_west_secret_arn
   downstream_api_urls = {
     api11 = data.terraform_remote_state.west_api11.outputs.api_invoke_url
   }

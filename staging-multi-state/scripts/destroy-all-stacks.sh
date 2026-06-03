@@ -7,8 +7,21 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
-export TF_VAR_aws_account_id="${TF_VAR_aws_account_id:-992382747916}"
-export AWS_PROFILE="${AWS_PROFILE:-admin}"
+if [[ "${USE_LOCALSTACK:-}" == "1" || "${TF_VAR_use_localstack:-}" == "true" ]]; then
+  export TF_VAR_use_localstack="true"
+  export TF_VAR_aws_account_id="${TF_VAR_aws_account_id:-000000000000}"
+  export TF_VAR_localstack_endpoint="${TF_VAR_localstack_endpoint:-http://localhost:4566}"
+  export AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID:-test}"
+  export AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY:-test}"
+  export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-us-east-1}"
+  export AWS_EC2_METADATA_DISABLED="true"
+  export SKIP_PREFLIGHT="${SKIP_PREFLIGHT:-1}"
+  unset AWS_PROFILE
+else
+  export TF_VAR_aws_account_id="${TF_VAR_aws_account_id:-992382747916}"
+  export AWS_PROFILE="${AWS_PROFILE:-admin}"
+fi
+
 export TF_VAR_environment="${TF_VAR_environment:-staging}"
 
 LOG_DIR="${LOG_DIR:-${TMPDIR:-/tmp}/staging-multi-state-destroy-$$}"

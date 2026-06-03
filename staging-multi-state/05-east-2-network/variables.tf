@@ -87,3 +87,16 @@ variable "east_2_tgw_asn" {
   type    = number
   default = 64515
 }
+
+variable "use_localstack" {
+  type        = bool
+  description = "Route AWS provider calls for this stack to LocalStack instead of AWS."
+  default     = false
+}
+
+variable "localstack_endpoint" {
+  type        = string
+  description = "LocalStack edge endpoint used when use_localstack is true."
+  default     = "http://localhost:4566"
+}
+
