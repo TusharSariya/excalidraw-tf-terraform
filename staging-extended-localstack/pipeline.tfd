@@ -117,12 +117,6 @@ bind eks_node_group      = staging-extended-localstack::aws_eks_node_group.strea
 bind eks_fargate_profile = staging-extended-localstack::aws_eks_fargate_profile.stream_processors
 bind eks_coredns_addon   = staging-extended-localstack::aws_eks_addon.core_dns
 bind eks_observability_addon = staging-extended-localstack::aws_eks_addon.observability
-bind eks_s3_irsa         = staging-extended-localstack::aws_iam_role.eks_service_accounts["s3"]
-bind eks_kinesis_irsa    = staging-extended-localstack::aws_iam_role.eks_service_accounts["kinesis"]
-bind eks_sqs_irsa        = staging-extended-localstack::aws_iam_role.eks_service_accounts["sqs"]
-bind eks_dynamodb_irsa   = staging-extended-localstack::aws_iam_role.eks_service_accounts["dynamodb"]
-bind redis_cache         = staging-extended-localstack::aws_cloudwatch_log_group.redis_cache
-bind kafka_backbone      = staging-extended-localstack::aws_cloudwatch_log_group.kafka_backbone
 
 bind lake_schedule       = staging-extended-localstack::aws_cloudwatch_event_rule.lake_curation
 bind lake_state_machine  = staging-extended-localstack::aws_sfn_state_machine.lake_curation
@@ -234,9 +228,8 @@ sns_event_bus_topic -> priority_standard_queue, replay_fifo_queue, quarantine_qu
 quarantine_queue -> quarantine_bucket
 
 eks_cluster -> eks_node_group, eks_fargate_profile, eks_coredns_addon, eks_observability_addon
-eks_node_group -> eks_s3_irsa, eks_kinesis_irsa, eks_sqs_irsa, eks_dynamodb_irsa
-eks_node_group -> redis_cache, kafka_backbone, glue_curator_job
-eks_fargate_profile -> kinesis_data_stream, priority_standard_queue
+eks_node_group -> glue_curator_job
+eks_fargate_profile -> priority_standard_queue
 
 lake_schedule -> lake_state_machine
 lake_state_machine -> glue_crawler, glue_curator_job
